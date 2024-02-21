@@ -8,7 +8,7 @@ const app = express();
 const cors = require('cors');
 
 app.use(cors({
-  origin: 'http://localhost:3000/', // use your actual domain name (or localhost), using * is not recommended
+  origin: 'http://localhost:3000', // use your actual domain name (or localhost), using * is not recommended
     // optionsSuccessStatus: 200,
 }))
 app.use(express.json({ limit: "150mb" }));
