@@ -8,7 +8,7 @@ const app = express();
 const cors = require('cors');
 
 app.use(cors({
-  origin: 'https://yuratattoodo.com', // use your actual domain name (or localhost), using * is not recommended
+  origin: 'http://localhost:3000/', // use your actual domain name (or localhost), using * is not recommended
     // optionsSuccessStatus: 200,
 }))
 app.use(express.json({ limit: "150mb" }));
@@ -62,8 +62,8 @@ function requestBodyObject(body) {
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: "liliia.test.email@gmail.com",
-        pass: "gpjsjyswzcgpfnch",
+        user: "lilis.tattoo.test@gmail.com",
+        pass: "ihml zrwn xugb fmna",
       },
       tls: {
         rejectUnauthorized: false,
@@ -72,8 +72,8 @@ function requestBodyObject(body) {
   
     // send mail with defined transport object
     let mailOptions = {
-      from: "liliia.test.email@gmail.com",
-      to: "yuratattoodo@gmail.com",
+      from: "lilis.tattoo.test@gmail.com",
+      to: "sidone@gmail.com",
       replyTo: `${request.body.email}`, 
       subject: `New Sign Up for Tattooing from ${request.body.firstName} ${request.body.lastName}`,
       text: "profile below",
