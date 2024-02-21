@@ -63,7 +63,7 @@ function requestBodyObject(body) {
       secure: false, // true for 465, false for other ports
       auth: {
         user: "lilis.tattoo.test@gmail.com",
-        pass: "ihml zrwn xugb fmna",
+        pass: "ihmlzrwnxugbfmna",
       },
       tls: {
         rejectUnauthorized: false,
@@ -95,6 +95,7 @@ function requestBodyObject(body) {
           profile: request.body,
           info: info,
         };
+        console.log(errorInfo)
         result.json(errorInfo);
         return;
       }
@@ -114,6 +115,6 @@ function requestBodyObject(body) {
 
 
 
-app.listen(3000, () => {
+app.listen(3001, () => {
   console.log("server started...");
 });
