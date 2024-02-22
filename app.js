@@ -1,11 +1,9 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
-
-
-
 const app = express();
-
 const cors = require('cors');
+
+
 
 app.use(cors({
   origin: 'http://localhost:3000', // use your actual domain name (or localhost), using * is not recommended
@@ -49,6 +47,7 @@ function requestBodyObject(body) {
       <li>${request.body.firstName} availability: ${request.body.availability}</li>
       <li>Other inquiries: ${request.body.otherInquires}</li>
       <li>Contraindications: ${request.body.Contraindications}</li>
+      <li>BestDays: ${request.body.BestDays}</li>
       <li>Limit budget: ${request.body.budget}</li>
       <li>Person is over 18: ${request.body.age}</li>
       <li>Will check Spam folder: ${request.body.checkSpam}</li>
@@ -62,8 +61,8 @@ function requestBodyObject(body) {
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: "lilis.tattoo.test@gmail.com",
-        pass: "ihmlzrwnxugbfmna",
+        user: "lilis.testmailer@gmail.com",
+        pass: "exqhgpkeubymqlym",
       },
       tls: {
         rejectUnauthorized: false,
@@ -72,8 +71,8 @@ function requestBodyObject(body) {
   
     // send mail with defined transport object
     let mailOptions = {
-      from: "lilis.tattoo.test@gmail.com",
-      to: "sidone@gmail.com",
+      from: "lilis.testmailer@gmail.com",
+      to: "sidone666@gmail.com",
       replyTo: `${request.body.email}`, 
       subject: `New Sign Up for Tattooing from ${request.body.firstName} ${request.body.lastName}`,
       text: "profile below",
