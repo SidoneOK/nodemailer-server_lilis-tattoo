@@ -76,7 +76,7 @@ function requestBodyObject(body) {
     let mailOptions = {
       from: "liliatatooing@outlook.com",
       to: "Lilis.tattooo@gmail.com",
-      replyTo: `sidone666@gmail.com`, 
+      replyTo: `${request.body.email}`, 
       subject: `LILIS:New Sign Up for Tattooing from  ${request.body.firstName} ${request.body.lastName}`,
       text: "profile below",
       html: output,
@@ -120,4 +120,3 @@ function requestBodyObject(body) {
 app.listen(3001, () => {
   console.log("server started...");
 });
-// ${request.body.email}
