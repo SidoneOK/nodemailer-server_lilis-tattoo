@@ -75,8 +75,8 @@ function requestBodyObject(body) {
     // send mail with defined transport object
     let mailOptions = {
       from: "liliatatooing@outlook.com",
-      to: "sidone666@gmail.com",
-      replyTo: `oleksiikat@gmail.com`, 
+      to: "Lilis.tattooo@gmail.com",
+      replyTo: `${request.body.email}`, 
       subject: `LILIS:New Sign Up for Tattooing from  ${request.body.firstName} ${request.body.lastName}`,
       text: "profile below",
       html: output,
