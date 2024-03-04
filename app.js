@@ -2,6 +2,7 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const app = express();
 const cors = require('cors');
+require('dotenv').config()
 
 
 
@@ -9,6 +10,8 @@ app.use(cors({
   origin: 'https://www.lilistattoo.com', // use your actual domain name (or localhost), using * is not recommended
     // optionsSuccessStatus: 200,
 }))
+app.options('/booking', cors());
+
 app.use(express.json({ limit: "150mb" }));
 
 
@@ -57,13 +60,12 @@ function requestBodyObject(body) {
     `;
   
     let transporter = nodemailer.createTransport({
-      servise: "gmail",
-      host: "smtp.gmail.com",
+      host: "smtp.office365.com",
       port: 587,
-      secure: false, // true for 465, false for other ports
+      secure: false, // STARTTLS// true for 465, false for other ports
       auth: {
-        user: "liliatattooemailer@gmail.com",
-        pass: "xbupkodlyyjpiawi",
+        user: process.env.EMAIL,
+        pass: process.env.APP_PASSWORD,
       },
       tls: {
         rejectUnauthorized: false,
@@ -72,7 +74,7 @@ function requestBodyObject(body) {
   
     // send mail with defined transport object
     let mailOptions = {
-      from: "liliatattooemailer@gmail.com",
+      from: "liliatatooing@outlook.com",
       to: "Lilis.tattooo@gmail.com",
       replyTo: `sidone666@gmail.com`, 
       subject: `LILIS:New Sign Up for Tattooing from  ${request.body.firstName} ${request.body.lastName}`,
@@ -118,5 +120,4 @@ function requestBodyObject(body) {
 app.listen(3001, () => {
   console.log("server started...");
 });
-
 // ${request.body.email}
