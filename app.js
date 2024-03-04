@@ -6,7 +6,7 @@ const cors = require('cors');
 
 
 app.use(cors({
-  origin: 'http://localhost:3000', // use your actual domain name (or localhost), using * is not recommended
+  origin: 'https://www.lilistattoo.com', // use your actual domain name (or localhost), using * is not recommended
     // optionsSuccessStatus: 200,
 }))
 app.use(express.json({ limit: "150mb" }));
@@ -30,8 +30,8 @@ function requestBodyObject(body) {
     console.log("Request start info", requestBodyObject(request.body));
   
     let output = `
-    <p>You have a new sign up for tattooing</p>
-    <h3>Sign Up Profile</h3>
+    <p>You have a new sign up for tattooing to Lilis</p>
+    <h3>Sign Up Profile </h3>
     <ul>
       <li>Name: ${request.body.firstName} ${request.body.lastName} </li>
       <li>Email: ${request.body.email} </li>
@@ -48,6 +48,7 @@ function requestBodyObject(body) {
       <li>Other inquiries: ${request.body.otherInquires}</li>
       <li>Contraindications: ${request.body.Contraindications}</li>
       <li>BestDays: ${request.body.BestDays}</li>
+      <li>otherInquires: ${request.body.otherInquires}</li>
       <li>Limit budget: ${request.body.budget}</li>
       <li>Person is over 18: ${request.body.age}</li>
       <li>Will check Spam folder: ${request.body.checkSpam}</li>
@@ -61,8 +62,8 @@ function requestBodyObject(body) {
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: "lilis.testmailer@gmail.com",
-        pass: "exqhgpkeubymqlym",
+        user: "liliatattooemailer@gmail.com",
+        pass: "xbupkodlyyjpiawi",
       },
       tls: {
         rejectUnauthorized: false,
@@ -71,10 +72,10 @@ function requestBodyObject(body) {
   
     // send mail with defined transport object
     let mailOptions = {
-      from: "lilis.testmailer@gmail.com",
-      to: "sidone666@gmail.com",
-      replyTo: `${request.body.email}`, 
-      subject: `New Sign Up for Tattooing from ${request.body.firstName} ${request.body.lastName}`,
+      from: "liliatattooemailer@gmail.com",
+      to: "Lilis.tattooo@gmail.com",
+      replyTo: `sidone666@gmail.com`, 
+      subject: `LILIS:New Sign Up for Tattooing from  ${request.body.firstName} ${request.body.lastName}`,
       text: "profile below",
       html: output,
       attachments: request.body.tattooImgArray.map((file) => {
@@ -117,3 +118,5 @@ function requestBodyObject(body) {
 app.listen(3001, () => {
   console.log("server started...");
 });
+
+// ${request.body.email}
