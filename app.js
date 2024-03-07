@@ -64,8 +64,8 @@ function requestBodyObject(body) {
       port: 587,
       secure: false, // STARTTLS// true for 465, false for other ports
       auth: {
-        user: process.env.EMAIL,
-        pass: process.env.APP_PASSWORD,
+        user: 'liliatatooing@outlook.com',
+        pass: 'liliia123456',
       },
       tls: {
         rejectUnauthorized: false,
