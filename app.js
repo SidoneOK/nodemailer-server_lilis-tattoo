@@ -64,8 +64,8 @@ function requestBodyObject(body) {
       port: 587,
       secure: false, // STARTTLS// true for 465, false for other ports
       auth: {
-        user: 'liliatatooing@outlook.com',
-        pass: 'liliia123456',
+        user: process.env.EMAIL,
+        pass: process.env.APP_PASSWORD,
       },
       tls: {
         rejectUnauthorized: false,
@@ -75,7 +75,7 @@ function requestBodyObject(body) {
     // send mail with defined transport object
     let mailOptions = {
       from: "liliatatooing@outlook.com",
-      to: "Lilis.tattooo@gmail.com",
+      to: "liliatatooing@outlook.com",
       replyTo: `${request.body.email}`, 
       subject: `LILIS:New Sign Up for Tattooing from  ${request.body.firstName} ${request.body.lastName}`,
       text: "profile below",
