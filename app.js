@@ -60,9 +60,10 @@ function requestBodyObject(body) {
     `;
   
     let transporter = nodemailer.createTransport({
-      host: "smtp.office365.com",
+      servise: "gmail",
+      host: "smtp.gmail.com",
       port: 587,
-      secure: false, // STARTTLS// true for 465, false for other ports
+      secure: false, // true for 465, false for other ports
       auth: {
         user: process.env.EMAIL,
         pass: process.env.APP_PASSWORD,
@@ -74,8 +75,8 @@ function requestBodyObject(body) {
   
     // send mail with defined transport object
     let mailOptions = {
-      from: "liliatatooing@outlook.com",
-      to: "liliatatooing@outlook.com",
+      from: "testLiliaTatto@gmail.com",
+      to: "testLiliaTatto@gmail.com",
       replyTo: `${request.body.email}`, 
       subject: `LILIS:New Sign Up for Tattooing from  ${request.body.firstName} ${request.body.lastName}`,
       text: "profile below",
