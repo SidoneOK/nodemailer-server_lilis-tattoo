@@ -94,7 +94,7 @@ app.post("/sent", function (request, result) {
   // send mail with defined transport object
   let mailOptions = {
     from: "testLiliaTatto@gmail.com",
-    to: "sidone666@gmail.com",
+    to: "lilis.tattooo@gmail.com",
     replyTo: `${request.body.email}`,
     subject: `LILIS:New Sign Up for Tattooing from  ${request.body.firstName} ${request.body.lastName}`,
     text: "profile below",
