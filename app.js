@@ -64,15 +64,39 @@ function requestBodyObject(body) {
 //   }
 // }
 
+// async function sendToTg(message) {
+//   try {
+//     let url = 'https://api.telegram.org/bot' + process.env.TELEGRAM_BOT_TOKEN + '/sendMessage?chat_id=' + process.env.TG_CHAT + '&text=' + message;
+
+//     const res = await fetch(url, {
+//       method: 'GET',
+//       redirect: 'follow'
+//     });
+//     console.log("No problem", url);
+//     return res;
+//   } catch (error) {
+//     console.error('Error sending message to Telegram:', error);
+//     throw error; 
+//   }
+// }
+
 async function sendToTg(message) {
   try {
-    let url = 'https://api.telegram.org/bot' + process.env.TELEGRAM_BOT_TOKEN + '/sendMessage?chat_id=' + process.env.TG_CHAT + '&text=' + message;
+    let url = 'https://api.telegram.org/bot' + process.env.TELEGRAM_BOT_TOKEN + '/sendMessage';
+    const body = JSON.stringify({
+      chat_id: process.env.TG_CHAT,
+      text: message
+    });
 
     const res = await fetch(url, {
-      method: 'GET',
-      redirect: 'follow'
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: body
     });
-    console.log("No problem", url);
+
+    console.log("No problem", message);
     return res;
   } catch (error) {
     console.error('Error sending message to Telegram:', error);
