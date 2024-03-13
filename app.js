@@ -14,7 +14,7 @@ OAuth2_client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN })
 
 app.use(cors({
   origin: 'https://www.lilistattoo.com', // use your actual domain name (or localhost), using * is not recommended
-  // optionsSuccessStatus: 200, https://www.lilistattoo.com
+  // optionsSuccessStatus: 200, https://www.lilistattoo.com   http://localhost:3000
 }))
 app.options('/booking', cors());
 
@@ -35,10 +35,55 @@ function requestBodyObject(body) {
   };
 }
 
+// async function sendToTg(message) {
+//   try {
+
+//     let url = 'https://api.telegram.org/bot' + process.env.TELEGRAM_BOT_TOKEN + '/sendMessage';
+//     let body = JSON.stringify({
+//       chat_id: process.env.TG_CHAT,
+//       parse_mode: 'Markdown',
+//       text: message,
+//     });
+//     const res = await fetch(url, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json; charset=utf-8',
+//         'Access-Control-Allow-Credentials': 'true',
+//         'Access-Control-Allow-Origin': '*',
+//         'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+//         'Access-Control-Allow-Headers':
+//           'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
+//       },
+//       body,
+//     });
+//     console.log("No problem", message);
+//     return res;
+//   } catch (error) {
+//     console.error('Error sending message to Telegram:', error);
+//     throw error; // Ретранслюємо помилку для обробки вище
+//   }
+// }
+
+async function sendToTg(message) {
+  try {
+    let url = 'https://api.telegram.org/bot' + process.env.TELEGRAM_BOT_TOKEN + '/sendMessage?chat_id=' + process.env.TG_CHAT + '&text=' + message;
+
+    const res = await fetch(url, {
+      method: 'GET',
+      redirect: 'follow'
+    });
+    console.log("No problem", url);
+    return res;
+  } catch (error) {
+    console.error('Error sending message to Telegram:', error);
+    throw error; 
+  }
+}
+
 
 
 app.post("/sent", function (request, result) {
-  console.log("Request start info", requestBodyObject(request.body));
+  // console.log("Request start info", requestBodyObject(request.body));
 
   let output = `
     <p>You have a new sign up for tattooing to Lilis</p>
@@ -76,7 +121,7 @@ app.post("/sent", function (request, result) {
       user: process.env.EMAIL,
       clientId: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
-      refreshToken: process.env.REFRESH_TOKEN ,
+      refreshToken: process.env.REFRESH_TOKEN,
       accessToken: accessToken
     },
     host: "smtp.gmail.com",
@@ -94,7 +139,7 @@ app.post("/sent", function (request, result) {
   // send mail with defined transport object
   let mailOptions = {
     from: "testLiliaTatto@gmail.com",
-    to: "lilis.tattooo@gmail.com",
+    to: "sidone666@gmail.com", //lilis.tattooo@gmail.com
     replyTo: `${request.body.email}`,
     subject: `LILIS:New Sign Up for Tattooing from  ${request.body.firstName} ${request.body.lastName}`,
     text: "profile below",
@@ -116,7 +161,14 @@ app.post("/sent", function (request, result) {
         profile: request.body,
         info: info,
       };
-      console.log(errorInfo)
+      console.log(error, 'email sender error')
+
+      const errorMessage = `
+      Error sending email:Code: ${error.code}
+      Command: ${error.command}
+      Message: ${error.message}
+    `;
+      sendToTg(errorMessage)
       result.json(errorInfo);
       return;
     }
@@ -126,7 +178,31 @@ app.post("/sent", function (request, result) {
       profile: requestBodyObject(request.body),
       info: info,
     };
+
+    const tgMessage = `
+      Email sent successfully:
+      Name: ${emailSent.profile.firstName} ${emailSent.profile.lastName}
+      Email: ${emailSent.profile.email}
+      Telephone: ${emailSent.profile.telephone}
+      Instagram Nickname: ${emailSent.profile.instagramNikname}
+      Birth Date: ${emailSent.profile.birthDate}
+      Location: ${emailSent.profile.location}
+      Tattoo Size: ${emailSent.profile.TattooSize}
+      Placement: ${emailSent.profile.Placement}
+      Skin Tone: ${emailSent.profile.skinTone}
+      Message: ${emailSent.profile.message}
+      Tattoo Color: ${emailSent.profile.tatooColor}
+      Availability: ${emailSent.profile.availability}
+      Contraindications: ${emailSent.profile.Contraindications}
+      Best Days: ${emailSent.profile.BestDays}
+      Other Inquiries: ${emailSent.profile.otherInquires}
+      Budget: ${emailSent.profile.budget}
+      Age: ${emailSent.profile.age}
+      Check Spam Folder: ${emailSent.profile.checkSpam}
+    `;
     // console.log("Email sent piece", request.body);
+    // console.log(emailSent, 'emailSent shom emailer')
+    sendToTg(tgMessage)
     result.json(emailSent);
   };
 
