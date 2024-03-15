@@ -35,7 +35,7 @@ function requestBodyObject(body) {
   };
 }
 
-async function sendToTgOstwon(message) {
+async function sendToTg(message) {
   try {
 
     let url = 'https://api.telegram.org/bot' + process.env.TELEGRAM_BOT_TOKEN + '/sendMessage';
@@ -64,30 +64,15 @@ async function sendToTgOstwon(message) {
   }
 }
 
-async function sendToTg(message) {
-  try {
-    let url = 'https://api.telegram.org/bot' + process.env.TELEGRAM_BOT_TOKEN + '/sendMessage?chat_id=' + process.env.TG_CHAT + '&text=' + message;
 
-    const res = await fetch(url, {
-      method: 'GET',
-      redirect: 'follow'
-    });
-    console.log("No problem", url);
-    return res;
-  } catch (error) {
-    console.error('Error sending message to Telegram:', error);
-    throw error; 
-  }
-}
-
-app.get("/test", async function (req, res) {
-  try {
-    await sendToTgOstwon("message")
-    return true
-  } catch(error) {
-    return error
-  }
-})
+// app.get("/test", async function (req, res) {
+//   try {
+//     await sendToTg("message")
+//     return true
+//   } catch(error) {
+//     return error
+//   }
+// })
 
 
 
@@ -116,7 +101,6 @@ app.post("/sent", async function (request, result) {
       <li>Limit budget: ${request.body.budget}</li>
       <li>Person is over 18: ${request.body.age}</li>
       <li>Will check Spam folder: ${request.body.checkSpam}</li>
-  
     </ul>
     `;
 
@@ -172,9 +156,9 @@ app.post("/sent", async function (request, result) {
       console.log(error, 'email sender error')
 
       const errorMessage = `
-      Error sending email:Code: ${error.code}
-      Command: ${error.command}
-      Message: ${error.message}
+      Error sending email:Code: ${error.code}\n
+      Command: ${error.command}\n
+      Message: ${error.message}\n
     `;
       await sendToTg(errorMessage)
       result.json(errorInfo);
@@ -187,27 +171,8 @@ app.post("/sent", async function (request, result) {
       info: info,
     };
 
-    const tgMessage = `
-      Email sent successfully:
-      Name: ${emailSent.profile.firstName} ${emailSent.profile.lastName}
-      Email: ${emailSent.profile.email}
-      Telephone: ${emailSent.profile.telephone}
-      Instagram Nickname: ${emailSent.profile.instagramNikname}
-      Birth Date: ${emailSent.profile.birthDate}
-      Location: ${emailSent.profile.location}
-      Tattoo Size: ${emailSent.profile.TattooSize}
-      Placement: ${emailSent.profile.Placement}
-      Skin Tone: ${emailSent.profile.skinTone}
-      Message: ${emailSent.profile.message}
-      Tattoo Color: ${emailSent.profile.tatooColor}
-      Availability: ${emailSent.profile.availability}
-      Contraindications: ${emailSent.profile.Contraindications}
-      Best Days: ${emailSent.profile.BestDays}
-      Other Inquiries: ${emailSent.profile.otherInquires}
-      Budget: ${emailSent.profile.budget}
-      Age: ${emailSent.profile.age}
-      Check Spam Folder: ${emailSent.profile.checkSpam}
-    `;
+   
+    const tgMessage = getTgMessade(emailSent);
     // console.log("Email sent piece", request.body);
     // console.log(emailSent, 'emailSent shom emailer')
     await sendToTg(tgMessage)
@@ -217,6 +182,31 @@ app.post("/sent", async function (request, result) {
   transporter.sendMail(mailOptions, sendMailResultHandler);
 });
 
+
+function getTgMessade(emailSent) {
+  const tgMessage = `
+  Email sent successfully:\n
+  *Name:* ${emailSent.profile.firstName} ${emailSent.profile.lastName}\n
+  *Email:* ${emailSent.profile.email}\n
+  *Telephone:* ${emailSent.profile.telephone}\n
+  *Instagram Nickname:* ${emailSent.profile.instagramNikname}\n
+  *Birth Date:* ${emailSent.profile.birthDate}\n
+  *Location:* ${emailSent.profile.location}\n
+  *Tattoo Size:* ${emailSent.profile.TattooSize}\n
+  *Placement:* ${emailSent.profile.Placement}\n
+  *Skin Tone:* ${emailSent.profile.skinTone}\n
+  *Message:* ${emailSent.profile.message}\n
+  *Tattoo Color:* ${emailSent.profile.tatooColor}\n
+  *Availability:* ${emailSent.profile.availability}\n
+  *Contraindications:* ${emailSent.profile.Contraindications}\n
+  *Best Days:* ${emailSent.profile.BestDays}\n
+  *Other Inquiries:* ${emailSent.profile.otherInquires}\n
+  *Budget:* ${emailSent.profile.budget}\n
+  *Age:* ${emailSent.profile.age}\n
+  *Check Spam Folder:* ${emailSent.profile.checkSpam}\n
+`;
+  return tgMessage
+ }
 
 
 
