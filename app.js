@@ -14,7 +14,7 @@ OAuth2_client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN })
 
 app.use(cors({
   origin: 'https://www.lilistattoo.com', // use your actual domain name (or localhost), using * is not recommended
-  // optionsSuccessStatus: 200, https://www.lilistattoo.com   http://localhost:3000
+  // optionsSuccessStatus: 200, https://www.lilistattoo.com  
 }))
 app.options('/booking', cors());
 
