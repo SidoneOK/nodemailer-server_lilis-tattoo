@@ -2,7 +2,11 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const app = express();
 const cors = require('cors');
-require('dotenv').config()
+require('dotenv').config();
+
+const getTgMessade = require('./utils/getTgMessade');
+const sendToTg = require('./utils/sendToTg');
+const getEmailMessage = require('./utils/getEmailMessage');
 
 const { google } = require('googleapis')
 const OAuth2 = google.auth.OAuth2
@@ -14,7 +18,7 @@ OAuth2_client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN })
 
 app.use(cors({
   origin: 'https://www.lilistattoo.com', // use your actual domain name (or localhost), using * is not recommended
-  // optionsSuccessStatus: 200, https://www.lilistattoo.com  
+  // optionsSuccessStatus: 200, https://www.lilistattoo.com   
 }))
 app.options('/booking', cors());
 
@@ -35,34 +39,6 @@ function requestBodyObject(body) {
   };
 }
 
-async function sendToTg(message) {
-  try {
-
-    let url = 'https://api.telegram.org/bot' + process.env.TELEGRAM_BOT_TOKEN + '/sendMessage';
-    let body = JSON.stringify({
-      chat_id: process.env.TG_CHAT,
-      parse_mode: 'Markdown',
-      text: message,
-    });
-    // console.log(url, body)
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-        'Access-Control-Allow-Headers':
-          'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
-      },
-      body,
-    });
-    console.log("No problem", message, res);
-    return res;
-  } catch (error) {
-    console.error('Error sending message to Telegram:', error);
-  }
-}
 
 
 // app.get("/test", async function (req, res) {
@@ -79,32 +55,9 @@ async function sendToTg(message) {
 app.post("/sent", async function (request, result) {
   // console.log("Request start info", requestBodyObject(request.body));
   try {
-    let output = `
-    <h3>LILIS:New Sign Up for Tattooing</h3>
-    <ul>
-      <li>Name: ${request.body.firstName} ${request.body.lastName} </li>
-      <li>Email: ${request.body.email} </li>
-      <li>Phone: ${request.body.telephone} </li>
-      <li>Instagram nickname: ${request.body.instagramNikname} </li>
-      <li>${request.body.firstName} birthday: ${request.body.birthDate} </li>
-      <li>${request.body.firstName} location: ${request.body.location}</li>
-      <li>Description of what ${request.body.firstName} want: ${request.body.message}</li>
-      <li>Tattoo size: ${request.body.TattooSize}</li>
-      <li>Placement on body: ${request.body.Placement}</li>
-      <li>Preferred skin tone: ${request.body.skinTone}</li>
-      <li>Preferred tattoo color: ${request.body.tatooColor}</li>
-      <li>${request.body.firstName} availability: ${request.body.availability}</li>
-      <li>Other inquiries: ${request.body.otherInquires}</li>
-      <li>Contraindications: ${request.body.Contraindications}</li>
-      <li>BestDays: ${request.body.BestDays}</li>
-      <li>otherInquires: ${request.body.otherInquires}</li>
-      <li>Limit budget: ${request.body.budget}</li>
-      <li>Person is over 18: ${request.body.age}</li>
-      <li>Will check Spam folder: ${request.body.checkSpam}</li>
-    </ul>
-    `;
+    let output = getEmailMessage(request);
 
-
+    //GOOGLE Authentification
     const accessToken = OAuth2_client.getAccessToken();
     let transporter = nodemailer.createTransport({
       servise: "gmail",
@@ -118,11 +71,7 @@ app.post("/sent", async function (request, result) {
       },
       host: "smtp.gmail.com",
       port: 587,
-      secure: false, // true for 465, false for other ports
-      // auth: {
-      //   user: process.env.EMAIL,
-      //   pass: process.env.APP_PASSWORD,
-      // },
+      secure: false, 
       tls: {
         rejectUnauthorized: false,
       },
@@ -144,6 +93,7 @@ app.post("/sent", async function (request, result) {
         };
       }),
     };
+    // SENT email with GOOGLE
     const info = await transporter.sendMail(mailOptions);
     let emailSent = {
       text: "Email sent",
@@ -153,6 +103,7 @@ app.post("/sent", async function (request, result) {
 
     const tgMessage = getTgMessade(emailSent);
     await sendToTg(tgMessage)
+    // response to front end
     result.json(emailSent)
   } catch (error) {
     let errorInfo = {
@@ -161,44 +112,21 @@ app.post("/sent", async function (request, result) {
       profile: request.body,
       // info: info,
     };
-
+    console.log(error, 'CATCH ERROR')
     const errorMessage = `
-    Error sending email:Code: ${error.code}\n
-    Command: ${error.command}\n
-    Message: ${error.message}\n
+    Error sending email:Code: ${error?.code}\n
+    Command: ${error?.command}\n
+    Message: ${error?.message}\n
   `;
+    
     await sendToTg(errorMessage)
     result.json(errorInfo)
   }
+
 });
-
-function getTgMessade(emailSent) {
-  const tgMessage = `
-  Email sent successfully:
-  *Name:* ${emailSent.profile.firstName} ${emailSent.profile.lastName}
-  *Email:* ${emailSent.profile.email}
-  *Telephone:* ${emailSent.profile.telephone}
-  *Instagram Nickname:* ${emailSent.profile.instagramNikname}
-  *Birth Date:* ${emailSent.profile.birthDate}
-  *Location:* ${emailSent.profile.location}
-  *Tattoo Size:* ${emailSent.profile.TattooSize}
-  *Placement:* ${emailSent.profile.Placement}
-  *Skin Tone:* ${emailSent.profile.skinTone}
-  *Message:* ${emailSent.profile.message}
-  *Tattoo Color:* ${emailSent.profile.tatooColor}
-  *Availability:* ${emailSent.profile.availability}
-  *Contraindications:* ${emailSent.profile.Contraindications}
-  *Best Days:* ${emailSent.profile.BestDays}
-  *Other Inquiries:* ${emailSent.profile.otherInquires}
-  *Budget:* ${emailSent.profile.budget}
-  *Age:* ${emailSent.profile.age}
-  *Check Spam Folder:* ${emailSent.profile.checkSpam}
-`;
-  return tgMessage.replace('`', '')
-}
-
 
 
 app.listen(3001, () => {
   console.log("server started...");
 });
+
