@@ -180,7 +180,10 @@ app.post("/sent", async function (request, result) {
   };
 
   transporter.sendMail(mailOptions, sendMailResultHandler);
-});
+  await sendToTg('after transporter')
+  console.log('after transporter')
+});  
+
 
 
 function getTgMessade(emailSent) {
