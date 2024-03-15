@@ -80,6 +80,14 @@ async function sendToTg(message) {
   }
 }
 
+app.get("/test", async function (req, res) {
+  try {
+    await sendToTg('message')
+    return true
+  } catch(error) {
+    return error
+  }
+})
 
 
 
