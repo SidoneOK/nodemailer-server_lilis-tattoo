@@ -60,7 +60,6 @@ async function sendToTg(message) {
     return res;
   } catch (error) {
     console.error('Error sending message to Telegram:', error);
-    throw error; // Ретранслюємо помилку для обробки вище
   }
 }
 
@@ -145,7 +144,7 @@ app.post("/sent", async function (request, result) {
     }),
   };
 
-  let sendMailResultHandler = async (error, info) => {
+  let sendMailResultHandler = (error, info) => {
     if (error) {
       let errorInfo = {
         text: "ERROR",
@@ -160,8 +159,9 @@ app.post("/sent", async function (request, result) {
       Command: ${error.command}\n
       Message: ${error.message}\n
     `;
-      await sendToTg(errorMessage)
-      result.json(errorInfo);
+      sendToTg(errorMessage).then(() =>
+        result.json(errorInfo)
+      )
       return;
     }
 
@@ -171,18 +171,19 @@ app.post("/sent", async function (request, result) {
       info: info,
     };
 
-   
+
     const tgMessage = getTgMessade(emailSent);
     // console.log("Email sent piece", request.body);
     // console.log(emailSent, 'emailSent shom emailer')
-    await sendToTg(tgMessage)
-    result.json(emailSent);
+    sendToTg(tgMessage).then(() =>
+      result.json(emailSent)
+    )
   };
 
   transporter.sendMail(mailOptions, sendMailResultHandler);
   await sendToTg('after transporter')
   console.log('after transporter')
-});  
+});
 
 
 
@@ -209,7 +210,7 @@ function getTgMessade(emailSent) {
   *Check Spam Folder:* ${emailSent.profile.checkSpam}\n
 `;
   return tgMessage
- }
+}
 
 
 
