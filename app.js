@@ -35,34 +35,34 @@ function requestBodyObject(body) {
   };
 }
 
-// async function sendToTg(message) {
-//   try {
+async function sendToTgOstwon(message) {
+  try {
 
-//     let url = 'https://api.telegram.org/bot' + process.env.TELEGRAM_BOT_TOKEN + '/sendMessage';
-//     let body = JSON.stringify({
-//       chat_id: process.env.TG_CHAT,
-//       parse_mode: 'Markdown',
-//       text: message,
-//     });
-//     const res = await fetch(url, {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json; charset=utf-8',
-//         'Access-Control-Allow-Credentials': 'true',
-//         'Access-Control-Allow-Origin': '*',
-//         'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-//         'Access-Control-Allow-Headers':
-//           'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
-//       },
-//       body,
-//     });
-//     console.log("No problem", message);
-//     return res;
-//   } catch (error) {
-//     console.error('Error sending message to Telegram:', error);
-//     throw error; // Ретранслюємо помилку для обробки вище
-//   }
-// }
+    let url = 'https://api.telegram.org/bot' + process.env.TELEGRAM_BOT_TOKEN + '/sendMessage';
+    let body = JSON.stringify({
+      chat_id: process.env.TG_CHAT,
+      parse_mode: 'Markdown',
+      text: message,
+    });
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+        'Access-Control-Allow-Headers':
+          'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
+      },
+      body,
+    });
+    console.log("No problem", message);
+    return res;
+  } catch (error) {
+    console.error('Error sending message to Telegram:', error);
+    throw error; // Ретранслюємо помилку для обробки вище
+  }
+}
 
 async function sendToTg(message) {
   try {
@@ -82,7 +82,7 @@ async function sendToTg(message) {
 
 app.get("/test", async function (req, res) {
   try {
-    await sendToTg('message')
+    await sendToTgOstwon("message")
     return true
   } catch(error) {
     return error
@@ -91,7 +91,7 @@ app.get("/test", async function (req, res) {
 
 
 
-app.post("/sent", function (request, result) {
+app.post("/sent", async function (request, result) {
   // console.log("Request start info", requestBodyObject(request.body));
 
   let output = `
@@ -161,7 +161,7 @@ app.post("/sent", function (request, result) {
     }),
   };
 
-  let sendMailResultHandler = (error, info) => {
+  let sendMailResultHandler = async (error, info) => {
     if (error) {
       let errorInfo = {
         text: "ERROR",
@@ -176,7 +176,7 @@ app.post("/sent", function (request, result) {
       Command: ${error.command}
       Message: ${error.message}
     `;
-      sendToTg(errorMessage)
+      await sendToTg(errorMessage)
       result.json(errorInfo);
       return;
     }
@@ -210,7 +210,7 @@ app.post("/sent", function (request, result) {
     `;
     // console.log("Email sent piece", request.body);
     // console.log(emailSent, 'emailSent shom emailer')
-    sendToTg(tgMessage)
+    await sendToTg(tgMessage)
     result.json(emailSent);
   };
 
