@@ -44,6 +44,7 @@ async function sendToTg(message) {
       parse_mode: 'Markdown',
       text: message,
     });
+    // console.log(url, body)
     const res = await fetch(url, {
       method: 'POST',
       headers: {
@@ -56,7 +57,7 @@ async function sendToTg(message) {
       },
       body,
     });
-    console.log("No problem", message);
+    console.log("No problem", message, res);
     return res;
   } catch (error) {
     console.error('Error sending message to Telegram:', error);
@@ -66,9 +67,9 @@ async function sendToTg(message) {
 
 // app.get("/test", async function (req, res) {
 //   try {
-//     await sendToTg("message")
+//     await sendToTg("test: ")
 //     return true
-//   } catch(error) {
+//   } catch (error) {
 //     return error
 //   }
 // })
@@ -77,9 +78,9 @@ async function sendToTg(message) {
 
 app.post("/sent", async function (request, result) {
   // console.log("Request start info", requestBodyObject(request.body));
-
-  let output = `
-    <h3>${request.body.firstName} ${request.body.lastName} </h3>
+  try {
+    let output = `
+    <h3>LILIS:New Sign Up for Tattooing</h3>
     <ul>
       <li>Name: ${request.body.firstName} ${request.body.lastName} </li>
       <li>Email: ${request.body.email} </li>
@@ -104,112 +105,96 @@ app.post("/sent", async function (request, result) {
     `;
 
 
-  const accessToken = OAuth2_client.getAccessToken();
-  let transporter = nodemailer.createTransport({
-    servise: "gmail",
-    auth: {
-      type: 'OAuth2',
-      user: process.env.EMAIL,
-      clientId: process.env.CLIENT_ID,
-      clientSecret: process.env.CLIENT_SECRET,
-      refreshToken: process.env.REFRESH_TOKEN,
-      accessToken: accessToken
-    },
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    // auth: {
-    //   user: process.env.EMAIL,
-    //   pass: process.env.APP_PASSWORD,
-    // },
-    tls: {
-      rejectUnauthorized: false,
-    },
-  });
+    const accessToken = OAuth2_client.getAccessToken();
+    let transporter = nodemailer.createTransport({
+      servise: "gmail",
+      auth: {
+        type: 'OAuth2',
+        user: process.env.EMAIL,
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET,
+        refreshToken: process.env.REFRESH_TOKEN,
+        accessToken: accessToken
+      },
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      // auth: {
+      //   user: process.env.EMAIL,
+      //   pass: process.env.APP_PASSWORD,
+      // },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
 
-  // send mail with defined transport object
-  let mailOptions = {
-    from: "testLiliaTatto@gmail.com",
-    to: "lilis.tattooo@gmail.com", //lilis.tattooo@gmail.com
-    replyTo: `${request.body.email}`,
-    subject: `LILIS:New Sign Up for Tattooing from  ${request.body.firstName} ${request.body.lastName}`,
-    text: "profile below",
-    html: output,
-    attachments: request.body.tattooImgArray.map((file) => {
-      return {
-        filename: file.title,
-        content: file.url.split("base64,")[1],
-        encoding: "base64",
-      };
-    }),
-  };
-
-  let sendMailResultHandler = (error, info) => {
-    if (error) {
-      let errorInfo = {
-        text: "ERROR",
-        message: error,
-        profile: request.body,
-        info: info,
-      };
-      console.log(error, 'email sender error')
-
-      const errorMessage = `
-      Error sending email:Code: ${error.code}\n
-      Command: ${error.command}\n
-      Message: ${error.message}\n
-    `;
-      sendToTg(errorMessage).then(() =>
-        result.json(errorInfo)
-      )
-      return;
-    }
-
+    // send mail with defined transport object
+    let mailOptions = {
+      from: "testLiliaTatto@gmail.com",
+      to: "lilis.tattooo@gmail.com", //lilis.tattooo@gmail.com sidone666@gmail.com
+      replyTo: `${request.body.email}`,
+      subject: `${request.body.firstName} ${request.body.lastName}`,
+      text: "profile below",
+      html: output,
+      attachments: request.body.tattooImgArray.map((file) => {
+        return {
+          filename: file.title,
+          content: file.url.split("base64,")[1],
+          encoding: "base64",
+        };
+      }),
+    };
+    const info = await transporter.sendMail(mailOptions);
     let emailSent = {
       text: "Email sent",
       profile: requestBodyObject(request.body),
       info: info,
     };
 
-
     const tgMessage = getTgMessade(emailSent);
-    // console.log("Email sent piece", request.body);
-    // console.log(emailSent, 'emailSent shom emailer')
-    sendToTg(tgMessage).then(() =>
-      result.json(emailSent)
-    )
-  };
+    await sendToTg(tgMessage)
+    result.json(emailSent)
+  } catch (error) {
+    let errorInfo = {
+      text: "ERROR",
+      message: error,
+      profile: request.body,
+      // info: info,
+    };
 
-  transporter.sendMail(mailOptions, sendMailResultHandler);
-  await sendToTg('after transporter')
-  console.log('after transporter')
+    const errorMessage = `
+    Error sending email:Code: ${error.code}\n
+    Command: ${error.command}\n
+    Message: ${error.message}\n
+  `;
+    await sendToTg(errorMessage)
+    result.json(errorInfo)
+  }
 });
-
-
 
 function getTgMessade(emailSent) {
   const tgMessage = `
-  Email sent successfully:\n
-  *Name:* ${emailSent.profile.firstName} ${emailSent.profile.lastName}\n
-  *Email:* ${emailSent.profile.email}\n
-  *Telephone:* ${emailSent.profile.telephone}\n
-  *Instagram Nickname:* ${emailSent.profile.instagramNikname}\n
-  *Birth Date:* ${emailSent.profile.birthDate}\n
-  *Location:* ${emailSent.profile.location}\n
-  *Tattoo Size:* ${emailSent.profile.TattooSize}\n
-  *Placement:* ${emailSent.profile.Placement}\n
-  *Skin Tone:* ${emailSent.profile.skinTone}\n
-  *Message:* ${emailSent.profile.message}\n
-  *Tattoo Color:* ${emailSent.profile.tatooColor}\n
-  *Availability:* ${emailSent.profile.availability}\n
-  *Contraindications:* ${emailSent.profile.Contraindications}\n
-  *Best Days:* ${emailSent.profile.BestDays}\n
-  *Other Inquiries:* ${emailSent.profile.otherInquires}\n
-  *Budget:* ${emailSent.profile.budget}\n
-  *Age:* ${emailSent.profile.age}\n
-  *Check Spam Folder:* ${emailSent.profile.checkSpam}\n
+  Email sent successfully:
+  *Name:* ${emailSent.profile.firstName} ${emailSent.profile.lastName}
+  *Email:* ${emailSent.profile.email}
+  *Telephone:* ${emailSent.profile.telephone}
+  *Instagram Nickname:* ${emailSent.profile.instagramNikname}
+  *Birth Date:* ${emailSent.profile.birthDate}
+  *Location:* ${emailSent.profile.location}
+  *Tattoo Size:* ${emailSent.profile.TattooSize}
+  *Placement:* ${emailSent.profile.Placement}
+  *Skin Tone:* ${emailSent.profile.skinTone}
+  *Message:* ${emailSent.profile.message}
+  *Tattoo Color:* ${emailSent.profile.tatooColor}
+  *Availability:* ${emailSent.profile.availability}
+  *Contraindications:* ${emailSent.profile.Contraindications}
+  *Best Days:* ${emailSent.profile.BestDays}
+  *Other Inquiries:* ${emailSent.profile.otherInquires}
+  *Budget:* ${emailSent.profile.budget}
+  *Age:* ${emailSent.profile.age}
+  *Check Spam Folder:* ${emailSent.profile.checkSpam}
 `;
-  return tgMessage
+  return tgMessage.replace('`', '')
 }
 
 
