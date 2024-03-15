@@ -87,8 +87,7 @@ app.post("/sent", function (request, result) {
   // console.log("Request start info", requestBodyObject(request.body));
 
   let output = `
-    <p>You have a new sign up for tattooing to Lilis</p>
-    <h3>Sign Up Profile </h3>
+    <h3>${request.body.firstName} ${request.body.lastName} </h3>
     <ul>
       <li>Name: ${request.body.firstName} ${request.body.lastName} </li>
       <li>Email: ${request.body.email} </li>
