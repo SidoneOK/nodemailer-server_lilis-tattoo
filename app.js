@@ -8,11 +8,11 @@ const getTgMessade = require('./utils/getTgMessade');
 const sendToTg = require('./utils/sendToTg');
 const getEmailMessage = require('./utils/getEmailMessage');
 
-const { google } = require('googleapis')
-const OAuth2 = google.auth.OAuth2
+// const { google } = require('googleapis')
+// const OAuth2 = google.auth.OAuth2
 
-const OAuth2_client = new OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
-OAuth2_client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN })
+// const OAuth2_client = new OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET)
+// OAuth2_client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN })
 
 
 
@@ -57,21 +57,35 @@ app.post("/sent", async function (request, result) {
   try {
     let output = getEmailMessage(request);
 
-    //GOOGLE Authentification
-    const accessToken = OAuth2_client.getAccessToken();
+    //GOOGLE Authentification    Dont work when cloud app goes to prod
+    // const accessToken = OAuth2_client.getAccessToken();
+    // let transporter = nodemailer.createTransport({
+    //   service: "gmail",
+    //   auth: {
+    //     type: 'OAuth2',
+    //     user: process.env.EMAIL,
+    //     clientId: process.env.CLIENT_ID,
+    //     clientSecret: process.env.CLIENT_SECRET,
+    //     refreshToken: process.env.REFRESH_TOKEN,
+    //     accessToken: accessToken
+    //   },
+    //   host: "smtp.gmail.com",
+    //   port: 587,
+    //   secure: false,
+    //   tls: {
+    //     rejectUnauthorized: false,
+    //   },
+    // });
+    
+    
     let transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        type: 'OAuth2',
-        user: process.env.EMAIL,
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
-        refreshToken: process.env.REFRESH_TOKEN,
-        accessToken: accessToken
-      },
-      host: "smtp.gmail.com",
+      host: "smtp.office365.com",
       port: 587,
-      secure: false, 
+      secure: false, // STARTTLS// true for 465, false for other ports
+      auth: {
+        user: process.env.OUTLOOK_EMAIL,
+        pass: process.env.OUTLOOK_PASSWORD,
+      },
       tls: {
         rejectUnauthorized: false,
       },
@@ -79,7 +93,7 @@ app.post("/sent", async function (request, result) {
 
     // send mail with defined transport object
     let mailOptions = {
-      from: "testLiliaTatto@gmail.com",
+      from: "liliatatooing@outlook.com",
       to: "lilis.tattooo@gmail.com", //lilis.tattooo@gmail.com sidone666@gmail.com
       replyTo: `${request.body.email}`,
       subject: `${request.body.firstName} ${request.body.lastName}`,
