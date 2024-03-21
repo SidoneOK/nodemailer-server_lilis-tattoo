@@ -60,7 +60,7 @@ app.post("/sent", async function (request, result) {
     //GOOGLE Authentification
     const accessToken = OAuth2_client.getAccessToken();
     let transporter = nodemailer.createTransport({
-      servise: "gmail",
+      service: "gmail",
       auth: {
         type: 'OAuth2',
         user: process.env.EMAIL,
