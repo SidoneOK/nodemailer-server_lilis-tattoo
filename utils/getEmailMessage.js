@@ -17,7 +17,6 @@ module.exports = function getEmailMessage(request) {
       <li>Other inquiries: ${request.body.otherInquires}</li>
       <li>Contraindications: ${request.body.Contraindications}</li>
       <li>BestDays: ${request.body.BestDays}</li>
-      <li>otherInquires: ${request.body.otherInquires}</li>
       <li>Limit budget: ${request.body.budget}</li>
       <li>Person is over 18: ${request.body.age}</li>
       <li>Will check Spam folder: ${request.body.checkSpam}</li>
